@@ -28,14 +28,14 @@ module.exports = {
         var records = await UserInfor.get(username);
         records = records && JSON.parse(records);
         var token = null;
-        if (records.password == password) {
+        if (records && records.password == password) {
             while (true) {
                 token = randomUtils.uid(255)
                 var result = await UserToken.creatWithExpireIn(token, JSON.stringify(records), sails.config.tokenLife);
                 if (result !== 'fail') break;
             }
             this.req.options.userinfo = records;
-            return exits.success({ 'access-token': token, expire: sails.config.tokenLife });
+            return exits.success({ 'access-token': token, expire: sails.config.tokenLife, userinfo: this.req.options.userinfo });
         }
         return exits.success({ 'em': 'Tài khoản hoặc mật khẩu không trùng khớp' });
     }

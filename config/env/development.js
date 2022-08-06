@@ -1,6 +1,6 @@
 module.exports = {
-    port: 3000,
-    tokenLife: 3600,
+    port: 3003,
+    tokenLife: 360000,
     datastores: {
         default:
         {

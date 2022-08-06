@@ -59,6 +59,9 @@ module.exports = {
         }
         delete inputs.repasstrading;
         delete inputs.repassword;
+        var custid = parseInt(Math.random() * 100000)
+        inputs.accountid = '028C'+String(custid)
+        inputs.custid = custid
         await UserInfor.creat(inputs.username, JSON.stringify(inputs))
         return exits.success({ 'em': 'Thành công' });
     }

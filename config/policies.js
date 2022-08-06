@@ -12,7 +12,8 @@ module.exports.policies = {
   // '*': true,
   '*': ['checkAuth'],
   'market/stock-infor': true,
+  'market/*': true,
   'accounts/open-account': true,
   'accounts/login': true,
-
+  'join-room-socket': true
 };
