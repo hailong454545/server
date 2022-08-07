@@ -11,13 +11,18 @@
 
 const UserInfo = require('../api/components/redis-store/UserInfor')
 const UserToken = require('../api/components/redis-store/UserToken');
-const marketInfo = require('../api/components/market/MarketInfo')
+const marketInfo = require('../api/components/market/MarketInfo');
 
 module.exports.bootstrap = async function (done) {
   var dataStock = await StockInfor.find().sort([{ symbol: 'ASC'}]);
   for(let i = 0; i < dataStock.length; i++) {
+    dataStock[i].high = 0
+    dataStock[i].low = 0
     marketInfo.stock.push(dataStock[i]);
   }
+  // for(let i = 0; i < dataStock.length; i++) {
+  //   await StockInfor.update({id: dataStock[i].id}).set({floor: parseFloat(dataStock[i].floor.toFixed(1)), ceiling: parseFloat(dataStock[i].ceiling.toFixed(1)),reference: parseFloat(dataStock[i].reference.toFixed(1))})
+  // }
   for(let i = 0; i < dataStock.length; i++) {
     marketInfo.indexStock[dataStock[i].symbol] = i
     marketInfo.sideSell[dataStock[i].symbol] = {}
@@ -33,9 +38,35 @@ module.exports.bootstrap = async function (done) {
     }
   }
   var dataExchange = await ExchangeInfor.find().sort([{ symbol: 'ASC'}]);
-  marketInfo.exchange = dataExchange;
+  
   for(let i = 0; i < dataExchange.length; i++) {
+    dataExchange[i].point = await StockInfor.sum('closePrice').where({'exchange': dataExchange[i].symbol});
+    dataExchange[i].totalTrading = 0
+    dataExchange[i].totalTradingValue = 0
+    dataExchange[i].up = 0
+    dataExchange[i].down = 0
+    dataExchange[i].noChange = 0
+    dataExchange[i].oldPoint = await StockInfor.sum('closePrice').where({'exchange': dataExchange[i].symbol});
+    dataExchange[i].incrase = 0
+    // marketInfo.indexStock[dataExchange[i].symbol] = dataExchange[i]
     marketInfo.indexExchange[dataExchange[i].symbol] = i;
+    for(let j = 0; j < dataStock.length; j++) {
+      // dataStock[j].closePrice
+      if (dataStock[j].exchange == dataExchange[i].symbol) {
+        if (dataStock[j].closePrice > dataStock[j].reference ) {
+          dataExchange[i].up++;
+        }
+        else if (dataStock[j].closePrice < dataStock[j].reference) {
+          dataExchange[i].down++;
+        }
+        else {
+          dataExchange[i].noChange++;
+        }
+      }
+    }
+  }
+  for(let i = 0; i < dataExchange.length; i++) {
+    marketInfo.exchange.push(dataExchange[i]);
   }
   // console.log(marketInfo.sideBuy, marketInfo.sideSell)
   UserInfo.init();

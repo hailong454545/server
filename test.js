@@ -17,15 +17,32 @@ var options = {
   body: JSON.stringify(body)
 };
 
+var optionsStock = {
+  'method': 'GET',
+  'url': 'http://localhost:3003/trade/marketInfo',
+  'headers': {
+  }
+};
 
-const BotSell = () => {
-  body.price = 6.45 + Math.ceil(Math.random() * 5 - 3) * 0.05
+const BotSell = (data) => {
+  var { price, symbol } = data
+  body.symbol = symbol
+  body.price = price + Math.ceil(Math.random() * 5 - 3) * 0.05
   options.body = JSON.stringify(body)
   request(options, function (error, response) {
     if (error) throw new Error(error);
   });
 }
 
-setInterval(BotSell, 200)
+
+request(optionsStock, function (error, response) {
+  if (error) throw new Error(error);
+  var data = response.body;
+  data = JSON.parse(data);
+  for(let i = 0; i < 10; i++) {
+    setInterval(BotSell, Math.ceil(Math.random() * 3 + 7)*1000 , {price: data[i].reference, symbol: data[i].symbol})
+  }
+});
+
 
 

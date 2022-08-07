@@ -1,4 +1,4 @@
-
+var { stock } = require('../../components/market/MarketInfo')
 function getRandomArbitrary(min, max) {
   return Math.random() * (max - min) + min;
 }
@@ -78,7 +78,7 @@ module.exports = {
             //         count[result[i].exchange]++;
             //     }
             // }
-            return exits.success(result)
+            return exits.success(result && stock)
         }
         else {
             var result = await StockInfor.find({ exchange });

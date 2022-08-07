@@ -1,3 +1,4 @@
+var { exchange } = require('../../components/market/MarketInfo')
 
 module.exports = {
     inputs: {
@@ -14,6 +15,6 @@ module.exports = {
     },
     fn: async function (inputs, exits) {
         var result = await ExchangeInfor.find();
-        return exits.success(result)
+        return exits.success(result && exchange)
     }
 };
