@@ -40,7 +40,7 @@ request(optionsStock, function (error, response) {
   var data = response.body;
   data = JSON.parse(data);
   for(let i = 0; i < 10; i++) {
-    setInterval(BotSell, Math.ceil(Math.random() * 3 + 7)*1000 , {price: data[i].reference, symbol: data[i].symbol})
+    setInterval(BotSell, Math.ceil(Math.random() * 3 + 7)*500 , {price: data[i].reference, symbol: data[i].symbol})
   }
 });
 

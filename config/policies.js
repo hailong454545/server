@@ -15,5 +15,6 @@ module.exports.policies = {
   'market/*': true,
   'accounts/open-account': true,
   'accounts/login': true,
-  'join-room-socket': true
+  'join-room-socket': true,
+  'get-data-chart': true,
 };

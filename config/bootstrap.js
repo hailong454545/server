@@ -13,6 +13,7 @@ const UserInfo = require('../api/components/redis-store/UserInfor')
 const UserToken = require('../api/components/redis-store/UserToken');
 const marketInfo = require('../api/components/market/MarketInfo');
 
+
 module.exports.bootstrap = async function (done) {
   var dataStock = await StockInfor.find().sort([{ symbol: 'ASC'}]);
   for(let i = 0; i < dataStock.length; i++) {
@@ -68,6 +69,27 @@ module.exports.bootstrap = async function (done) {
   for(let i = 0; i < dataExchange.length; i++) {
     marketInfo.exchange.push(dataExchange[i]);
   }
+  var dataChart = await Chart.find().sort([{'id': 'ASC'}]);
+  for(let i = 0; i < dataChart.length; i++) {
+    var { createdAt, open, high, low, close, volume } = dataChart[i]
+    marketInfo.chart.push([createdAt, open, high, low, close, volume])
+  }
+  marketInfo.chart.push([0, 0, 0, 0, 0, 0])
+  const sendSocketChart = async () => {
+    var dataClose = marketInfo.chart[marketInfo.chart.length-1]
+    var data = {
+      open: dataClose[1],
+      high: dataClose[2],
+      low: dataClose[3],
+      close: dataClose[4],
+      volume: dataClose[5],
+    }
+    var records = await Chart.create(data).fetch();
+    marketInfo.chart[marketInfo.chart.length-1][0] = records.createdAt
+    sails.sockets.blast('event-chart', marketInfo.chart[marketInfo.chart.length-1])
+    marketInfo.chart.push([0, 0, 0, 0, 0, 0])
+  }
+  // setInterval(sendSocketChart ,3000)
   // console.log(marketInfo.sideBuy, marketInfo.sideSell)
   UserInfo.init();
   UserToken.init();

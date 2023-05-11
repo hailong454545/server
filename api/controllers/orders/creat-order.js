@@ -1,4 +1,4 @@
-const { stock, exchange, indexExchange, indexStock, sideBuy, sideSell } = require('../../components/market/MarketInfo')
+const { chart, stock, exchange, indexExchange, indexStock, sideBuy, sideSell } = require('../../components/market/MarketInfo')
 
 const processExchange = (amount, price, symbol) => {
     var index = indexExchange[stock[indexStock[symbol]].exchange]
@@ -8,6 +8,25 @@ const processExchange = (amount, price, symbol) => {
     exchange[index].totalTrading += amount;
     exchange[index].totalTradingValue += amount*price;
     exchange[index].point = 0
+    if (symbol == 'ABB') {
+        if (chart[chart.length-1][1] == 0) {
+            chart[chart.length-1][1] = price
+            chart[chart.length-1][2] = price
+            chart[chart.length-1][3] = price
+            chart[chart.length-1][4] = price
+        }
+        else {
+            chart[chart.length-1][4] = price
+            if (price > chart[chart.length-1][2]) {
+                chart[chart.length-1][2] = price
+            }
+            if (price < chart[chart.length-1][3]) {
+                chart[chart.length-1][3] = price
+            }
+        }
+        chart[chart.length-1][5] += amount
+    
+    }
     for (let j = 0; j < stock.length; j++) {
         if (stock[j].exchange == exchange[index].symbol) {
             if (stock[j].closePrice > stock[j].reference) {
